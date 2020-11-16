@@ -1,4 +1,3 @@
-
 library(copynumber)
 library(GenomicRanges)
 library(reshape2)
@@ -7,7 +6,6 @@ library("ggplot2")
 library(cowplot)
 
 rm(list=ls(all=TRUE))
-lymphoma.res <- pcf(data=lymphoma,gamma=12,verbose=FALSE)
 case_list_for_discovery<-scan("./final_case_list_Aug2020.txt",what=character())
 
 segs_resp<-read.table("./responder_segs.txt",header=T,sep="\t",stringsAsFactors=F)
@@ -44,13 +42,12 @@ segs_resp2<-segs_resp2[segs_resp2$chrom!="24",]
 
 insertSource("./plot_line_nonresp.R",package="copynumber");plotFreq(segments=segs_resp2,thres.gain=0.2,thres.loss=-0.1)
 
-
 # Do cytoband analysis
-dels_resp<-read.table("./CPI1000_analysis/CN_analysis/resp_del_freqs.txt",stringsAsFactors=F,header=T)
-dels_non_resp<-read.table("./CPI1000_analysis/CN_analysis/non_resp_del_freqs.txt",stringsAsFactors=F,header=T)
-amps_resp<-read.table("./CPI1000_analysis/CN_analysis/resp_amp_freqs.txt",stringsAsFactors=F,header=T)
-amps_non_resp<-read.table("./CPI1000_analysis/CN_analysis/non_resp_amp_freqs.txt",stringsAsFactors=F,header=T)
-bands<-read.table("./CPI1000_analysis/CN_analysis/cytobands_b37.txt",stringsAsFactors=F,header=T)
+dels_resp<-read.table("./resp_del_freqs.txt",stringsAsFactors=F,header=T)
+dels_non_resp<-read.table("./non_resp_del_freqs.txt",stringsAsFactors=F,header=T)
+amps_resp<-read.table("./resp_amp_freqs.txt",stringsAsFactors=F,header=T)
+amps_non_resp<-read.table("./non_resp_amp_freqs.txt",stringsAsFactors=F,header=T)
+bands<-read.table("./cytobands_b37.txt",stringsAsFactors=F,header=T)
 #bands$cyto<-NULL;names(bands)[8]<-"cyto"
 bands_GR <- with(bands, GRanges(cumulative_chr, IRanges(start=(cumulative_start/1000),end=(cumulative_end/1000),names=paste0("covid:",seq(1:nrow(bands)))),cyto=cyto))
 
@@ -131,7 +128,6 @@ out_amps_comb_max_diff<-data.frame(out_amps_comb[out_amps_comb[, .I[freq_diff ==
 out_amps_comb_max_diff$start<-NULL
 out_amps_comb_max_diff<-out_amps_comb_max_diff[!duplicated(out_amps_comb_max_diff),]
 
-
 #merge outputs
 merged_dat<-merge(out_del_comb_max_diff,out_amps_comb_max_diff,by.x="cyto",by.y="cyto")
 merged_dat$freq_diff.x<-NULL
@@ -158,7 +154,7 @@ amp_hits$freq_diff<-(amp_hits$amp_freq_resp-amp_hits$amp_freq_non_resp)
 p1<-ggplot(data=del_hits, aes(x=reorder(cytoband,freq_diff), y=freq_diff)) +geom_bar(stat="identity", position=position_dodge(),fill="darkred")+ theme_minimal()+coord_flip()
 p2<-ggplot(data=amp_hits, aes(x=reorder(cytoband,freq_diff), y=freq_diff)) +geom_bar(stat="identity", position=position_dodge(),fill="darkblue")+ theme_minimal()+coord_flip()
 plot_grid(p1,p2)
-#ggsave("./CPI1000_analysis/Figure_Plotting/Figure4/cytoband_freqs.pdf",dpi=600)
+#ggsave("./cytoband_freqs.pdf",dpi=600)
 
 
 del_hits$labels2<-paste0(round(del_hits$del_pval,4),",",round(del_hits$del_qval,2))
@@ -168,9 +164,10 @@ p3<-ggplot(data=del_hits, aes(x=reorder(labels2,freq_diff), y=freq_diff)) +geom_
 p4<-ggplot(data=amp_hits, aes(x=reorder(labels2,freq_diff), y=freq_diff)) +geom_bar(stat="identity", position=position_dodge(),fill="darkblue")+ theme_minimal()+coord_flip()
 plot_grid(p3,p4)
 
-#ggsave("./CPI1000_analysis/Figure_Plotting/Figure4/cytoband_freqs_pvals.pdf",dpi=600)
+#ggsave("./cytoband_freqs_pvals.pdf",dpi=600)
 
-#make 9q34 plot
+## Only needed if you want to make a focal plot of a particular cytoband, to see if there is a strong peak over a particular gene
+## Example one for 9q34 plot
 out_del_to_plot<-data.frame(out_del_comb)
 index<-out_del_to_plot[1]=="chr9_q34"
 out_del_to_plot<-out_del_to_plot[index,]
@@ -183,11 +180,4 @@ out_del_to_plot$chr9_Mb<- out_del_to_plot$xleft-(1539159712/1000000)
 out_del_to_plot_m<-melt(out_del_to_plot,measure.vars = c("resp_del_freq","non_resp_del_freq"))
 
 ggplot(out_del_to_plot_m) + geom_line(aes(y = -freq_diff, x = chr9_Mb),color="black",size=0.6,data = out_del_to_plot, stat="identity")+scale_y_continuous()+theme_bw()
-
-#make freq plot by histology
-hist_freq<-read.table("CPI1000_analysis/CN_analysis/TRAF2_hist_freq.txt",header=T,stringsAsFactors=F)
-hist_freq_m<-melt(hist_freq,measure.vars = c("X._del_resp","X._del_non_resp"))
-hist_freq_m$Tumour_Type<-ordered(hist_freq_m$Tumour_Type,levels=c("Other","Melanoma","Bladder","Pan-cancer"))
-hist_freq_m$variable<-ordered(hist_freq_m$variable,levels=c("X._del_non_resp","X._del_resp"))
-ggplot(data=hist_freq_m, aes(x=Tumour_Type, y=value,color=variable,fill=variable)) +geom_bar(stat="identity", position=position_dodge())+ theme_classic()+coord_flip()+scale_fill_manual(values=c("darkred","darkblue"))+scale_color_manual(values=c("darkred","darkblue"))
 

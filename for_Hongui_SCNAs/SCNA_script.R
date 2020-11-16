@@ -6,8 +6,8 @@ library("ggplot2")
 library(cowplot)
 
 rm(list=ls(all=TRUE))
-lymphoma.res <- pcf(data=lymphoma,gamma=12,verbose=FALSE)
 case_list_for_discovery<-scan("./final_case_list_Aug2020.txt",what=character())
+lymphoma.res <- pcf(data=lymphoma,gamma=12,verbose=FALSE)
 
 segs_resp<-read.table("./responder_segs.txt",header=T,sep="\t",stringsAsFactors=F)
 segs_resp<-segs_resp[segs_resp$sample %in% case_list_for_discovery,]
@@ -155,7 +155,7 @@ amp_hits$freq_diff<-(amp_hits$amp_freq_resp-amp_hits$amp_freq_non_resp)
 p1<-ggplot(data=del_hits, aes(x=reorder(cytoband,freq_diff), y=freq_diff)) +geom_bar(stat="identity", position=position_dodge(),fill="darkred")+ theme_minimal()+coord_flip()
 p2<-ggplot(data=amp_hits, aes(x=reorder(cytoband,freq_diff), y=freq_diff)) +geom_bar(stat="identity", position=position_dodge(),fill="darkblue")+ theme_minimal()+coord_flip()
 plot_grid(p1,p2)
-#ggsave("./cytoband_freqs.pdf",dpi=600)
+ggsave("./cytoband_freqs.pdf",dpi=600)
 
 
 del_hits$labels2<-paste0(round(del_hits$del_pval,4),",",round(del_hits$del_qval,2))
@@ -165,7 +165,7 @@ p3<-ggplot(data=del_hits, aes(x=reorder(labels2,freq_diff), y=freq_diff)) +geom_
 p4<-ggplot(data=amp_hits, aes(x=reorder(labels2,freq_diff), y=freq_diff)) +geom_bar(stat="identity", position=position_dodge(),fill="darkblue")+ theme_minimal()+coord_flip()
 plot_grid(p3,p4)
 
-#ggsave("./cytoband_freqs_pvals.pdf",dpi=600)
+ggsave("./cytoband_freqs_pvals.pdf",dpi=600)
 
 ## Only needed if you want to make a focal plot of a particular cytoband, to see if there is a strong peak over a particular gene
 ## Example one for 9q34 plot
@@ -176,9 +176,9 @@ out_del_to_plot<-out_del_to_plot[index,]
 out_del_to_plot$xleft<-out_del_to_plot$start/1000
 #out_del_to_plot<-out_del_to_plot[,c(6,5)]
 #names(out_del_to_plot)[2]<-"freq.del"
-write.table(out_del_to_plot,"CPI1000_analysis/CN_analysis/9q34_deletion_freqs.txt",quote=F,sep="\t")
+#write.table(out_del_to_plot,"CPI1000_analysis/CN_analysis/9q34_deletion_freqs.txt",quote=F,sep="\t")
 out_del_to_plot$chr9_Mb<- out_del_to_plot$xleft-(1539159712/1000000)
 out_del_to_plot_m<-melt(out_del_to_plot,measure.vars = c("resp_del_freq","non_resp_del_freq"))
 
 ggplot(out_del_to_plot_m) + geom_line(aes(y = -freq_diff, x = chr9_Mb),color="black",size=0.6,data = out_del_to_plot, stat="identity")+scale_y_continuous()+theme_bw()
-
+ggsave("./focal_plot.pdf",dpi=600)

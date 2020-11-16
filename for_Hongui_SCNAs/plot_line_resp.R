@@ -1,9 +1,9 @@
 ####################################################################
-## Author: Gro Nilsen, Knut Liestøl and Ole Christian Lingjærde.
+## Author: Gro Nilsen, Knut LiestÃ¸l and Ole Christian LingjÃ¦rde.
 ## Maintainer: Gro Nilsen <gronilse@ifi.uio.no>
 ## License: Artistic 2.0
 ## Part of the copynumber package
-## Reference: Nilsen and Liestøl et al. (2012), BMC Genomics
+## Reference: Nilsen and LiestÃ¸l et al. (2012), BMC Genomics
 ####################################################################
 
 #Function that plots the frequency of deletions and amplifications given a threshold - by genome og chromosomes
@@ -151,9 +151,9 @@ genomeFreq <- function(data,thres.gain,thres.loss,pos.unit,layout,...){
 		#Plot frequencies:
     print(head(xleft))
     out_amp<-cbind(xleft,freq.amp)
-    write.table(out_amp,"./CPI1000_analysis/CN_analysis/resp_amp_freqs.txt",quote=F,sep="\t")
+    write.table(out_amp,"./resp_amp_freqs.txt",quote=F,sep="\t")
     out_del<-cbind(xleft,freq.del)
-    write.table(out_del,"./CPI1000_analysis/CN_analysis/resp_del_freqs.txt",quote=F,sep="\t")
+    write.table(out_del,"./resp_del_freqs.txt",quote=F,sep="\t")
     lines(xleft,freq.amp, type = "l", lty = 1, col = "darkblue")
     lines(xleft,-freq.del, type = "l", lty = 1, col = "darkblue")
     #rect(xleft=xleft,ybottom=0,xright=xright,ytop=freq.amp,col=op$col.gain,border=op$col.gain)

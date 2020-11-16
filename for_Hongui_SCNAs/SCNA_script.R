@@ -6,6 +6,7 @@ library("ggplot2")
 library(cowplot)
 
 rm(list=ls(all=TRUE))
+lymphoma.res <- pcf(data=lymphoma,gamma=12,verbose=FALSE)
 case_list_for_discovery<-scan("./final_case_list_Aug2020.txt",what=character())
 
 segs_resp<-read.table("./responder_segs.txt",header=T,sep="\t",stringsAsFactors=F)

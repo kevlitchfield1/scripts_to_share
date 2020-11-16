@@ -1,3 +1,3 @@
 # scripts_to_share
 
-Misc scripts fro sharing
+Miscellaneous scripts for sharing
